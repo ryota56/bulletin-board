@@ -1,0 +1,42 @@
+{
+  "site": {
+    "title": "5ch Board",
+    "description": "A bulletin board where you can post anonymously"
+  },
+  "header": {
+    "home": "Home",
+    "newThread": "Create New Thread",
+    "search": "Search",
+    "languageSelector": "Select Language"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "search": "Search",
+    "loadMore": "Load More"
+  },
+  "languages": {
+    "ja": "Japanese",
+    "en": "English"
+  },
+  "thread": {
+    "notFound": "Thread not found",
+    "returnHome": "Return Home",
+    "created": "Created",
+    "reply": "Post Reply",
+    "posterId": "Poster ID",
+    "enterContent": "Enter your content",
+    "posting": "Posting...",
+    "postFailure": "Failed to post. Please try again."
+  },
+  "newThread": {
+    "title": "Thread Title",
+    "enterTitle": "Enter title",
+    "content": "Content",
+    "enterContent": "Enter your content",
+    "creating": "Creating..."
+  },
+  "errors": {
+    "internal": "Internal server error"
+  }
+} 

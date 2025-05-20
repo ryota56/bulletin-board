@@ -1,0 +1,42 @@
+{
+  "site": {
+    "title": "5ch掲示板",
+    "description": "匿名で自由に投稿できる掲示板です"
+  },
+  "header": {
+    "home": "ホーム",
+    "newThread": "新規スレッド作成",
+    "search": "検索",
+    "languageSelector": "言語選択"
+  },
+  "buttons": {
+    "submit": "送信",
+    "cancel": "キャンセル",
+    "search": "検索",
+    "loadMore": "もっと見る"
+  },
+  "languages": {
+    "ja": "日本語",
+    "en": "English"
+  },
+  "thread": {
+    "notFound": "スレッドが見つかりません",
+    "returnHome": "ホームに戻る",
+    "created": "作成日",
+    "reply": "返信を投稿",
+    "posterId": "投稿者ID",
+    "enterContent": "投稿内容を入力してください",
+    "posting": "投稿中...",
+    "postFailure": "投稿に失敗しました。再度お試しください。"
+  },
+  "newThread": {
+    "title": "スレッドタイトル",
+    "enterTitle": "タイトルを入力してください",
+    "content": "本文",
+    "enterContent": "投稿内容を入力してください",
+    "creating": "作成中..."
+  },
+  "errors": {
+    "internal": "内部エラーが発生しました"
+  }
+} 
