@@ -173,8 +173,8 @@ export default function ThreadDetail() {
   if (!ready) {
     return (
       <Layout>
-        <div className="flex justify-center p-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+        <div className="flex justify-center p-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-500"></div>
         </div>
       </Layout>
     );
@@ -183,8 +183,8 @@ export default function ThreadDetail() {
   if (loading && !thread) {
     return (
       <Layout>
-        <div className="flex justify-center p-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+        <div className="flex justify-center p-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-500"></div>
         </div>
       </Layout>
     );
@@ -195,14 +195,14 @@ export default function ThreadDetail() {
     return (
       <Layout>
         <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-red-500">{t('thread.notFound')}</h1>
-          <div className="mt-4 p-4 bg-gray-100 rounded text-left overflow-auto max-w-2xl mx-auto">
-            <h2 className="font-bold">デバッグ情報:</h2>
+          <h1 className="text-2xl font-bold text-accent-600">{t('thread.notFound')}</h1>
+          <div className="mt-6 p-5 bg-base-100 rounded-lg shadow-md text-left overflow-auto max-w-2xl mx-auto">
+            <h2 className="font-bold font-serif">デバッグ情報:</h2>
             <p>スレッドID: {id}</p>
             <p>言語: {locale}</p>
             <button
               onClick={() => router.push('/')}
-              className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="mt-4 btn btn-primary"
             >
               {t('thread.returnHome')}
             </button>
@@ -216,10 +216,10 @@ export default function ThreadDetail() {
     return (
       <Layout>
         <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-red-500">{t('thread.notFound')}</h1>
+          <h1 className="text-2xl font-bold text-accent-600">{t('thread.notFound')}</h1>
           <button
             onClick={() => router.push('/')}
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="mt-6 btn btn-primary"
           >
             {t('thread.returnHome')}
           </button>
@@ -230,39 +230,40 @@ export default function ThreadDetail() {
   
   return (
     <Layout title={thread?.title}>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">{thread?.title}</h1>
-        <div className="text-sm text-gray-500 mt-1">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold font-serif text-base-800 tracking-tight">{thread?.title}</h1>
+        <div className="text-sm text-base-500 mt-2">
           {t('thread.created')}: {thread && new Date(thread.created_at).toLocaleString()}
         </div>
       </div>
       
-      <div className="bg-white shadow rounded-lg mb-6 divide-y">
-        {posts.map((post) => (
+      <div className="card mb-8 divide-y divide-base-200 animate-fade-in-up">
+        {posts.map((post, index) => (
           <div 
             key={post.id || post.post_id}
-            className="p-4"
+            className="p-6"
+            style={{animationDelay: `${index * 0.1}s`}}
           >
-            <div className="flex justify-between mb-2">
-              <span className="font-medium text-gray-700">{post.anonymous_id}</span>
-              <span className="text-sm text-gray-500">
+            <div className="flex justify-between mb-3">
+              <span className="font-medium text-base-700">{post.anonymous_id}</span>
+              <span className="text-sm text-base-500">
                 {new Date(post.created_at).toLocaleString()}
               </span>
             </div>
-            <div className="whitespace-pre-wrap">{post.body}</div>
+            <div className="whitespace-pre-wrap text-base-700">{post.body}</div>
           </div>
         ))}
       </div>
       
-      <div className="bg-white shadow rounded-lg p-4">
-        <h2 className="text-lg font-medium mb-4">{t('thread.reply')}</h2>
+      <div className="card p-6">
+        <h2 className="text-xl font-medium font-serif mb-5 text-base-800">{t('thread.reply')}</h2>
         <form onSubmit={handleReply}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t('thread.posterId')}: {anonymousId}
+          <div className="mb-5">
+            <label className="block text-base-700 text-sm font-medium mb-2">
+              {t('thread.posterId')}: <span className="font-serif">{anonymousId}</span>
             </label>
             <textarea
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input w-full px-4 py-3 text-base-700"
               rows={5}
               value={replyBody}
               onChange={(e) => setReplyBody(e.target.value)}
@@ -275,7 +276,7 @@ export default function ThreadDetail() {
             disabled={submitting}
             className={`btn ${
               submitting
-                ? 'bg-gray-400'
+                ? 'bg-base-400 cursor-not-allowed'
                 : 'btn-primary'
             }`}
           >

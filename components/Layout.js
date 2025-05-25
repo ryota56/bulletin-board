@@ -37,15 +37,17 @@ export default function Layout({ children, title }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <div className="min-h-screen flex flex-col bg-gray-100">
+      <div className="min-h-screen flex flex-col bg-base-50">
         <Header />
         
-        <main className="flex-grow container mx-auto p-4">
+        <main className="flex-grow container mx-auto px-4 py-8 md:px-6 lg:px-8">
           {children}
         </main>
         
-        <footer className="bg-gray-800 text-white p-4 text-center">
-          <p>© {new Date().getFullYear()} 5ch Board</p>
+        <footer className="bg-base-800 text-white py-6 px-4">
+          <div className="container mx-auto text-center">
+            <p className="font-serif text-base-100">© {new Date().getFullYear()} 5ch Board</p>
+          </div>
         </footer>
       </div>
     </>

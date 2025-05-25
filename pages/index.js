@@ -51,39 +51,39 @@ export default function Home() {
   
   return (
     <Layout>
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{ready ? t('site.title') : ""}</h1>
+      <div className="mb-8 flex justify-between items-center">
+        <h1 className="text-3xl font-bold font-serif text-base-800 tracking-tight">{ready ? t('site.title') : ""}</h1>
         <Link 
           href="/new-thread"
-          className="btn btn-primary"
+          className="btn btn-primary animate-float"
         >
           {ready ? t('header.newThread') : ""}
         </Link>
       </div>
       
       {loading ? (
-        <div className="flex justify-center p-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+        <div className="flex justify-center p-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-500"></div>
         </div>
       ) : (
         <>
-          <div className="bg-white shadow rounded-lg divide-y">
+          <div className="card divide-y divide-base-200 animate-fade-in-up">
             {threads.length > 0 ? (
               threads.map((thread) => (
-                <div key={thread.id || thread.thread_id} className="p-4 hover:bg-gray-50">
+                <div key={thread.id || thread.thread_id} className="p-6 hover:bg-base-50 transition-colors duration-200">
                   <Link 
                     href={`/threads/${thread.thread_id}`}
                     className="block"
                   >
-                    <h2 className="text-lg font-medium text-gray-900">{thread.title}</h2>
-                    <div className="mt-1 text-sm text-gray-500">
+                    <h2 className="text-xl font-medium font-serif text-base-800">{thread.title}</h2>
+                    <div className="mt-2 text-sm text-base-500">
                       {new Date(thread.updated_at).toLocaleString()}
                     </div>
                   </Link>
                 </div>
               ))
             ) : (
-              <div className="p-6 text-center text-gray-500">
+              <div className="p-8 text-center text-base-500">
                 スレッドがありません
               </div>
             )}
@@ -91,15 +91,15 @@ export default function Home() {
           
           {/* ページネーション */}
           {totalPages > 1 && (
-            <div className="flex justify-center mt-6 space-x-2">
+            <div className="flex justify-center mt-8 space-x-2">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
                 <button
                   key={pageNumber}
                   onClick={() => handlePageChange(pageNumber)}
-                  className={`px-3 py-1 rounded ${
+                  className={`px-4 py-2 rounded-lg transition-all duration-300 ${
                     pageNumber === page
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 hover:bg-gray-300'
+                      ? 'bg-accent-500 text-white shadow-md'
+                      : 'bg-base-200 text-base-700 hover:bg-base-300 hover:shadow-sm'
                   }`}
                 >
                   {pageNumber}

@@ -64,8 +64,8 @@ export default function NewThread() {
   if (!ready) {
     return (
       <Layout>
-        <div className="flex justify-center p-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+        <div className="flex justify-center p-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-500"></div>
         </div>
       </Layout>
     );
@@ -73,19 +73,19 @@ export default function NewThread() {
   
   return (
     <Layout title={ready ? t('header.newThread') : ""}>
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">{t('header.newThread')}</h1>
+      <div className="max-w-2xl mx-auto animate-fade-in-up">
+        <h1 className="text-3xl font-bold font-serif text-base-800 tracking-tight mb-8">{t('header.newThread')}</h1>
         
-        <div className="bg-white shadow rounded-lg p-6">
+        <div className="card p-8">
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
+            <div className="mb-6">
+              <label className="block text-base-700 text-sm font-medium mb-2" htmlFor="title">
                 {t('newThread.title')}
               </label>
               <input
                 id="title"
                 type="text"
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input w-full text-base-700"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t('newThread.enterTitle')}
@@ -94,14 +94,14 @@ export default function NewThread() {
               />
             </div>
             
-            <div className="mb-6">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="body">
+            <div className="mb-8">
+              <label className="block text-base-700 text-sm font-medium mb-2" htmlFor="body">
                 {t('newThread.content')}
               </label>
               <textarea
                 id="body"
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={8}
+                className="input w-full text-base-700"
+                rows={10}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder={t('newThread.enterContent')}
@@ -113,18 +113,18 @@ export default function NewThread() {
               <button
                 type="button"
                 onClick={() => router.push('/')}
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                className="btn btn-secondary"
               >
                 {t('buttons.cancel')}
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className={`${
+                className={`btn ${
                   submitting
-                    ? 'bg-gray-400'
-                    : 'bg-blue-500 hover:bg-blue-700'
-                } text-white font-bold py-2 px-4 rounded`}
+                    ? 'bg-base-400 text-white cursor-not-allowed'
+                    : 'btn-primary animate-float'
+                }`}
               >
                 {submitting ? t('newThread.creating') : t('buttons.submit')}
               </button>
