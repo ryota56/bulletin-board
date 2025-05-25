@@ -120,7 +120,7 @@ export default function ThreadDetail() {
     setSubmitting(true);
     
     try {
-      const res = await fetch('/api/posts', {
+      const res = await fetch(`/api/posts?lang=${locale}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ export default function ThreadDetail() {
           threadId: thread.thread_id,
           body: replyBody,
           anonymousId,
-          language: 'ja', // 日本語固定（拡張可能）
+          uiLang: locale, // 現在のUI言語を送信
         }),
       });
       
@@ -137,12 +137,34 @@ export default function ThreadDetail() {
         throw new Error(`Error: ${res.status}`);
       }
       
+      // 投稿レスポンスを取得
+      const postData = await res.json();
+      console.log('Post response:', postData);
+      
       // 投稿成功
       setReplyBody('');
-      fetchThread(); // リアルタイム更新がない場合は手動でフェッチ
+      
+      // 翻訳結果がある場合は即座に表示に反映
+      if (postData.translated) {
+        // 既存の投稿一覧に新しい投稿を追加（翻訳済み）
+        const newPost = {
+          ...postData,
+          body: postData.translated.body // 翻訳されたテキストを表示
+        };
+        
+        setPosts(prevPosts => [...prevPosts, newPost]);
+      } else {
+        // 翻訳結果がない場合は原文のまま表示
+        setPosts(prevPosts => [...prevPosts, postData]);
+      }
+      
+      // スクロールを最下部に移動
+      window.scrollTo(0, document.body.scrollHeight);
     } catch (error) {
       console.error('Error posting reply:', error);
       alert(ready ? t('thread.postFailure') : '投稿に失敗しました');
+      // エラー発生時はスレッドを再取得
+      fetchThread();
     } finally {
       setSubmitting(false);
     }
@@ -216,9 +238,9 @@ export default function ThreadDetail() {
       </div>
       
       <div className="bg-white shadow rounded-lg mb-6 divide-y">
-        {posts.map((post, index) => (
+        {posts.map((post) => (
           <div 
-            key={post.post_id}
+            key={post.id || post.post_id}
             className="p-4"
           >
             <div className="flex justify-between mb-2">

@@ -70,7 +70,7 @@ export default function Home() {
           <div className="bg-white shadow rounded-lg divide-y">
             {threads.length > 0 ? (
               threads.map((thread) => (
-                <div key={thread.thread_id} className="p-4 hover:bg-gray-50">
+                <div key={thread.id || thread.thread_id} className="p-4 hover:bg-gray-50">
                   <Link 
                     href={`/threads/${thread.thread_id}`}
                     className="block"
