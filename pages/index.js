@@ -76,6 +76,14 @@ export default function Home() {
                     className="block"
                   >
                     <h2 className="text-xl font-medium font-serif text-base-800">{thread.title}</h2>
+                    {thread.description && (
+                      <p className="mt-1 text-sm text-base-600">
+                        {((thread[`description_${locale}`] || thread.description).length > 50)
+                          ? `${(thread[`description_${locale}`] || thread.description).substring(0, 50)}...` 
+                          : (thread[`description_${locale}`] || thread.description)
+                        }
+                      </p>
+                    )}
                     <div className="mt-2 text-sm text-base-500">
                       {new Date(thread.updated_at).toLocaleString()}
                     </div>

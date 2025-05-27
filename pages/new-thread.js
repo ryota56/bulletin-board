@@ -28,6 +28,7 @@ export default function NewThread() {
         body: JSON.stringify({
           title,
           body,
+          description: body, // 本文をスレッドの説明文として使用
           language: 'ja', // 日本語固定（拡張可能）
         }),
       });
@@ -96,7 +97,7 @@ export default function NewThread() {
             
             <div className="mb-8">
               <label className="block text-base-700 text-sm font-medium mb-2" htmlFor="body">
-                {t('newThread.content')}
+                スレッドの説明
               </label>
               <textarea
                 id="body"
@@ -104,9 +105,12 @@ export default function NewThread() {
                 rows={10}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder={t('newThread.enterContent')}
+                placeholder="このスレッドの目的や、どのような投稿を期待するかを説明してください"
                 required
               />
+              <p className="mt-2 text-sm text-base-500">
+                スレッドを立ち上げる目的や、他のユーザーがどのような内容を投稿すべきかを説明してください。
+              </p>
             </div>
             
             <div className="flex items-center justify-between">

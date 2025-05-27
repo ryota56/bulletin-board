@@ -93,6 +93,15 @@ export default async function handler(req, res) {
         console.log(`API HANDLER: Thread ${id} has no title to translate.`);
       }
 
+      // スレッド説明文の翻訳
+      if (threadData.thread.description) {
+        console.log(`API HANDLER: Processing description for thread ${id}. Original: "${threadData.thread.description.substring(0,50)}...", Original lang: ${threadOriginalLang}, Target UI lang: ${uiLang}`);
+        const translatedDescription = await translateContent(threadData.thread.description, uiLang, threadOriginalLang, `thread_${id}`, 'description');
+        threadData.thread[`description_${uiLangParam.toLowerCase()}`] = translatedDescription;
+      } else {
+        console.log(`API HANDLER: Thread ${id} has no description to translate.`);
+      }
+
       // 各投稿の本文を翻訳
       if (threadData.posts && threadData.posts.length > 0) {
         console.log(`API HANDLER: Processing ${threadData.posts.length} posts for thread ${id}.`);

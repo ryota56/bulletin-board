@@ -130,10 +130,53 @@ export default async function handler(req, res) {
                 
                 console.log(`スレッド一覧翻訳成功: "${thread.title.slice(0, 20)}..." -> "${translatedTitle.slice(0, 20)}..."`);
                 
-                translatedThreads.push({
+                // スレッドに翻訳後のタイトルを設定
+                const translatedThread = {
                   ...thread,
                   title: translatedTitle
-                });
+                };
+
+                // 説明文の翻訳
+                if (thread.description) {
+                  const descriptionCacheKey = lang === 'en' ? 'description_en' : 'description_ja';
+                  
+                  // 既存の説明文翻訳キャッシュをチェック
+                  if (thread[descriptionCacheKey]) {
+                    console.log(`説明文の翻訳キャッシュを使用: ${thread.thread_id}`);
+                    translatedThread[descriptionCacheKey] = thread[descriptionCacheKey];
+                  } else {
+                    try {
+                      // 説明文翻訳実行
+                      console.log(`スレッド説明文を翻訳: "${thread.description.slice(0, 20)}..." (${threadLang} → ${targetLang})`);
+                      const translatedDescription = await translateWithDeepL({
+                        text: thread.description,
+                        targetLang
+                      });
+                      
+                      if (translatedDescription) {
+                        // 翻訳結果をスレッドに設定
+                        translatedThread[descriptionCacheKey] = translatedDescription;
+                        
+                        // 次回使用するためにスレッドに保存
+                        try {
+                          const originalThread = threadsStore.find(t => t.thread_id === thread.thread_id);
+                          if (originalThread) {
+                            originalThread[descriptionCacheKey] = translatedDescription;
+                          }
+                        } catch (cacheError) {
+                          console.error('説明文翻訳キャッシュ保存エラー:', cacheError);
+                        }
+                        
+                        console.log(`スレッド説明文翻訳成功: "${thread.description.slice(0, 20)}..." -> "${translatedDescription.slice(0, 20)}..."`);
+                      }
+                    } catch (descriptionError) {
+                      console.error('スレッド説明文翻訳エラー:', descriptionError, { threadId: thread.thread_id });
+                      // エラー時は翻訳なしで続行
+                    }
+                  }
+                }
+                
+                translatedThreads.push(translatedThread);
               } catch (translationError) {
                 console.error('スレッドタイトル翻訳エラー:', translationError, { threadId: thread.thread_id });
                 
@@ -189,7 +232,7 @@ export default async function handler(req, res) {
       
     case 'POST':
       try {
-        const { title, body, lang = 'ja' } = req.body;
+        const { title, body, description, lang = 'ja' } = req.body;
         
         if (!title || !body) {
           return res.status(400).json({ error: 'Title and body are required' });
@@ -219,25 +262,29 @@ export default async function handler(req, res) {
         const newThread = {
           thread_id,
           title,
+          description: description || body, // 説明文フィールドを追加（ない場合は本文を使用）
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           language: detected
         };
         
-        // 最初の投稿を作成
+        // 最初の投稿は作成しない（説明文はスレッドのdescriptionとして保存するだけ）
+        /*
+        // 最初の投稿を作成（改行を含むテキストを忠実に反映）
         const newPost = {
           post_id: `${thread_id}_1`,
           thread_id,
-          body,
+          body, // 改行やテキストを忠実に保持
           anonymous_id: anonymousId,
           created_at: new Date().toISOString(),
           language: detected
         };
+        */
         
         try {
-          // スレッドと投稿を保存
+          // スレッドを保存（投稿は作成しない）
           addThread(newThread);
-          addPost(thread_id, newPost);
+          // addPost(thread_id, newPost);
           
           // スレッドが正しく保存されたか確認
           const savedThread = threadsStore.find(t => t.thread_id === thread_id);
@@ -273,6 +320,36 @@ export default async function handler(req, res) {
             text: translated 
           });
           /* --------------------------------------------------------- */
+
+          /* ---------- ★追加：説明文を翻訳してキャッシュ ---------- */
+          if (description) {
+            try {
+              const descSrcLang = detectLang(description);
+              const descTargetLang = oppositeLang(descSrcLang);
+              const translatedDesc = dictionaryLookup(description, descTargetLang) || 
+                                     await translateText(description, descTargetLang);
+              
+              await saveTranslation({
+                sourceId: thread_id,
+                field: 'description',
+                lang: descTargetLang.toLowerCase(),
+                text: translatedDesc
+              });
+              
+              // メモリ内のスレッドにも保存
+              const savedThread = threadsStore.find(t => t.thread_id === thread_id);
+              if (savedThread) {
+                const descCacheKey = descTargetLang.toLowerCase() === 'en' ? 'description_en' : 'description_ja';
+                savedThread[descCacheKey] = translatedDesc;
+              }
+              
+              console.log(`説明文翻訳完了: "${description.slice(0, 20)}..." → "${translatedDesc.slice(0, 20)}..."`);
+            } catch (descTranslateError) {
+              console.error('説明文翻訳エラー:', descTranslateError);
+              // 翻訳エラーはスレッド作成の失敗とはみなさない
+            }
+          }
+          /* --------------------------------------------------------- */
         } catch (translateError) {
           console.error('タイトル翻訳保存エラー:', translateError);
           // 翻訳エラーはスレッド作成の失敗とはみなさない
@@ -280,7 +357,7 @@ export default async function handler(req, res) {
         
         return res.status(201).json({
           thread: newThread,
-          post: newPost,
+          // post: newPost,
           anonymousId
         });
         

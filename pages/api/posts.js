@@ -71,8 +71,8 @@ export default async function handler(req, res) {
           addThread(thread);
         }
         
-        // ユーザーID（匿名）
-        const userId = anonymousId || `匿名${Math.floor(Math.random() * 1000)}`;
+        // ユーザーID（匿名）- クライアントからのIDは使わず、毎回新しく生成
+        const userId = `匿名${Math.floor(Math.random() * 1000)}`;
         
         // 投稿の言語を検出
         let detected = '';
@@ -89,12 +89,12 @@ export default async function handler(req, res) {
           detected = /[\u3040-\u30FF\u4E00-\u9FFF]/.test(body) ? 'ja' : 'en';
         }
         
-        // 1) 原文はそのまま保存
+        // 1) 原文はそのまま保存（改行を含む）
         const postId = `${threadId}_${Date.now()}`;
         const newPost = {
           post_id: postId,
           thread_id: threadId,
-          body: body,
+          body: body, // 改行やテキストを忠実に保持
           anonymous_id: userId,
           created_at: new Date().toISOString(),
           language: detected

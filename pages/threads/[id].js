@@ -63,18 +63,6 @@ export default function ThreadDetail() {
       if (threadData) {
         setThread(threadData.thread);
         setPosts(threadData.posts || []);
-        
-        // ローカルストレージから匿名IDを取得するか新規生成
-        if (typeof window !== 'undefined') {
-          const storedId = localStorage.getItem(`anonymousId_${id}`);
-          if (storedId) {
-            setAnonymousId(storedId);
-          } else {
-            const newId = `匿名${Math.floor(Math.random() * 1000)}`;
-            setAnonymousId(newId);
-            localStorage.setItem(`anonymousId_${id}`, newId);
-          }
-        }
       } else {
         throw new Error('Failed to fetch thread after multiple attempts');
       }
@@ -84,6 +72,25 @@ export default function ThreadDetail() {
       setLoading(false);
     }
   };
+  
+  // 匿名IDを取得・保存するための専用useEffect
+  useEffect(() => {
+    if (!id) return;
+    
+    // ローカルストレージから匿名IDを取得するか新規生成
+    if (typeof window !== 'undefined') {
+      const storedId = localStorage.getItem(`anonymousId_${id}`);
+      if (storedId) {
+        console.log(`匿名ID読み込み: ${storedId}`);
+        setAnonymousId(storedId);
+      } else {
+        const newId = `匿名${Math.floor(Math.random() * 1000)}`;
+        console.log(`新規匿名ID生成: ${newId}`);
+        setAnonymousId(newId);
+        localStorage.setItem(`anonymousId_${id}`, newId);
+      }
+    }
+  }, [id]); // idが変わったときだけ実行
   
   // リアルタイムサブスクリプション設定
   useEffect(() => {
@@ -120,6 +127,9 @@ export default function ThreadDetail() {
     setSubmitting(true);
     
     try {
+      // 毎回新しい匿名IDをランダムに生成
+      const randomAnonymousId = `匿名${Math.floor(Math.random() * 1000)}`;
+      
       const res = await fetch(`/api/posts?lang=${locale}`, {
         method: 'POST',
         headers: {
@@ -128,7 +138,7 @@ export default function ThreadDetail() {
         body: JSON.stringify({
           threadId: thread.thread_id,
           body: replyBody,
-          anonymousId,
+          anonymousId: randomAnonymousId, // 毎回ランダムな匿名IDを使用
           uiLang: locale, // 現在のUI言語を送信
         }),
       });
@@ -235,24 +245,42 @@ export default function ThreadDetail() {
         <div className="text-sm text-base-500 mt-2">
           {t('thread.created')}: {thread && new Date(thread.created_at).toLocaleString()}
         </div>
+        
+        {/* スレッドの説明文を表示 */}
+        {thread?.description && (
+          <div className="mt-4 p-4 bg-base-100 rounded-lg border border-base-200">
+            <h2 className="text-lg font-medium text-base-800 mb-2">
+              {locale === 'ja' ? 'スレッドの説明' : 'Thread Description'}
+            </h2>
+            <div className="whitespace-pre-wrap text-base-700">
+              {thread[`description_${locale}`] || thread.description}
+            </div>
+          </div>
+        )}
       </div>
       
       <div className="card mb-8 divide-y divide-base-200 animate-fade-in-up">
-        {posts.map((post, index) => (
-          <div 
-            key={post.id || post.post_id}
-            className="p-6"
-            style={{animationDelay: `${index * 0.1}s`}}
-          >
-            <div className="flex justify-between mb-3">
-              <span className="font-medium text-base-700">{post.anonymous_id}</span>
-              <span className="text-sm text-base-500">
-                {new Date(post.created_at).toLocaleString()}
-              </span>
+        {posts.length > 0 ? (
+          posts.map((post, index) => (
+            <div 
+              key={post.id || post.post_id}
+              className="p-6"
+              style={{animationDelay: `${index * 0.1}s`}}
+            >
+              <div className="flex justify-between mb-3">
+                <span className="font-medium text-base-700">{post.anonymous_id || '匿名ユーザー'}</span>
+                <span className="text-sm text-base-500">
+                  {new Date(post.created_at).toLocaleString()}
+                </span>
+              </div>
+              <div className="whitespace-pre-wrap text-base-700">{post.body}</div>
             </div>
-            <div className="whitespace-pre-wrap text-base-700">{post.body}</div>
+          ))
+        ) : (
+          <div className="p-6 text-center text-base-600">
+            まだ投稿はありません。最初の投稿をしてみましょう！
           </div>
-        ))}
+        )}
       </div>
       
       <div className="card p-6">
@@ -260,7 +288,7 @@ export default function ThreadDetail() {
         <form onSubmit={handleReply}>
           <div className="mb-5">
             <label className="block text-base-700 text-sm font-medium mb-2">
-              {t('thread.posterId')}: <span className="font-serif">{anonymousId}</span>
+              {t('thread.posterId')}: <span className="font-serif">匿名ユーザー（投稿ごとにランダムなIDが割り当てられます）</span>
             </label>
             <textarea
               className="input w-full px-4 py-3 text-base-700"
